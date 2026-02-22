@@ -95,22 +95,6 @@ http://localhost:5000
 - `re` - Email validation
 - `datetime` - Timestamps
 
-## 📁 Project Structure
-
-```
-Contact App/
-├── app.py              # CLI application
-├── web_app.py          # Flask web application
-├── contacts.json       # Data storage (auto-generated)
-├── requirements.txt    # Python dependencies
-├── templates/
-│   └── index.html     # Web interface HTML
-└── static/
-    ├── css/
-    │   └── style.css  # Styles and animations
-    └── js/
-        └── app.js     # Frontend JavaScript logic
-```
 
 ## 🔧 API Endpoints (Web Version)
 
