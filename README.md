@@ -137,13 +137,12 @@ The application includes advanced location sharing and mapping capabilities:
 
 ### Map Functionality
 - **Interactive Maps**: View all contacts' locations on an interactive map interface
-- **Real-time Updates**: Location data updates in real-time when contacts share their locations
 - **Zoom & Pan**: Easily navigate the map to explore contact locations
 - **Location Markers**: Each contact appears as a marker on the map with their details
 - **Location History**: Track location sharing history for contacts
 
 ### How to Use Location Sharing
-1. Navigate to the location sharing section in the web interface
+1. Navigate to the web interface
 2. Enable location sharing for specific contacts
 3. View shared locations on the interactive map
 4. Click on markers to see contact details and location information
