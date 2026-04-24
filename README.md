@@ -26,6 +26,7 @@ A professional contact management system with **two interfaces**: a command-line
 - 🤖 AI-powered suggestions and duplicate detection
 - 📦 Bulk import/export operations
 - 🔄 Bulk update and delete operations
+- 🗺️ Interactive location sharing and mapping
 
 ### Advanced Interfaces
 - ⚡ **Ultra Pro Interface** (`/ultra-pro`): 3D holographic UI with neural networks
@@ -86,6 +87,10 @@ http://localhost:5000
 - Click **"📥 Export"** to download all contacts as JSON
 - **Edit or delete** contacts using card buttons
 - Click the **star icon** to mark/unmark favorites
+- 🗺️ **Location Sharing**: View contact locations on an interactive map
+  - Access the map from the contacts interface
+  - View real-time location sharing when enabled
+  - Zoom and pan to explore contact locations
 
 ## 🛠️ Tech Stack
 
@@ -125,6 +130,29 @@ http://localhost:5000
 | POST | `/api/contacts/bulk/update` | Bulk update contacts |
 | GET | `/api/contacts/<id>/notes` | Get contact notes |
 | POST | `/api/contacts/<id>/notes` | Add note to contact |
+
+## 🗺️ Location Sharing & Map Features
+
+The application includes advanced location sharing and mapping capabilities:
+
+### Map Functionality
+- **Interactive Maps**: View all contacts' locations on an interactive map interface
+- **Real-time Updates**: Location data updates in real-time when contacts share their locations
+- **Zoom & Pan**: Easily navigate the map to explore contact locations
+- **Location Markers**: Each contact appears as a marker on the map with their details
+- **Location History**: Track location sharing history for contacts
+
+### How to Use Location Sharing
+1. Navigate to the location sharing section in the web interface
+2. Enable location sharing for specific contacts
+3. View shared locations on the interactive map
+4. Click on markers to see contact details and location information
+5. Use map controls for zooming and panning
+
+### Location Data
+- Locations are securely stored with contact information
+- Location sharing can be toggled on/off per contact
+- Timestamp of last location update is tracked
 
 ## ✅ Validation Rules
 
