@@ -12,15 +12,24 @@ A professional contact management system with **two interfaces**: a command-line
 - 🗑️ Delete contacts
 - 📧 Email validation
 - 📞 Phone number validation (minimum 10 digits)
-- 💾 JSON file-based storage
+- 💾 JSON file-based storage or Supabase cloud storage
 
 ### Web Version Exclusive Features
 - ⭐ Mark contacts as favorites
 - 🏷️ Categorize contacts (Family, Friends, Work, General)
 - 📊 Real-time statistics dashboard
-- 📥 Export contacts to JSON
+- 📥 Export contacts to JSON/CSV
 - 🎨 Modern responsive UI with animations
 - 📱 Mobile-friendly design
+- 🔍 Advanced search with filters
+- 📈 Analytics and insights
+- 🤖 AI-powered suggestions and duplicate detection
+- 📦 Bulk import/export operations
+- 🔄 Bulk update and delete operations
+
+### Advanced Interfaces
+- ⚡ **Ultra Pro Interface** (`/ultra-pro`): 3D holographic UI with neural networks
+- 🧠 **AI Dashboard** (`/ai-dashboard`): AI-powered contact intelligence platform
 
 ## 📦 Installation
 
@@ -101,10 +110,21 @@ http://localhost:5000
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/` | Main web interface |
+| GET | `/ultra-pro` | Ultra Pro holographic interface |
+| GET | `/ai-dashboard` | AI-powered dashboard |
 | GET | `/api/contacts` | Get all contacts |
 | POST | `/api/contacts` | Add new contact |
 | PUT | `/api/contacts/<id>` | Update contact |
 | DELETE | `/api/contacts/<id>` | Delete contact |
+| GET | `/api/contacts/search` | Advanced search with filters |
+| GET | `/api/analytics` | Contact analytics and insights |
+| GET | `/api/ai/suggestions` | AI-powered suggestions |
+| GET | `/api/export` | Export contacts (JSON/CSV) |
+| POST | `/api/contacts/bulk` | Bulk import contacts |
+| POST | `/api/contacts/bulk/delete` | Bulk delete contacts |
+| POST | `/api/contacts/bulk/update` | Bulk update contacts |
+| GET | `/api/contacts/<id>/notes` | Get contact notes |
+| POST | `/api/contacts/<id>/notes` | Add note to contact |
 
 ## ✅ Validation Rules
 

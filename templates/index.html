@@ -3,81 +3,787 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Contact Manager Pro</title>
+    <title>ContactPro X | Enterprise Contact Management</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/location-sharing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-settings.css') }}">
+    <!-- Advanced Libraries -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    
+    <!-- Leaflet Map (free, no API key) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📱 Contact Manager Pro</h1>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i data-lucide="contact"></i>
+            </div>
+            <div class="loading-text">
+                <h2>ContactPro X</h2>
+                <p>Initializing Enterprise Dashboard...</p>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Command Palette -->
+    <div id="commandPalette" class="command-palette" style="display: none;">
+        <div class="command-overlay" onclick="closeCommandPalette()"></div>
+        <div class="command-content">
+            <div class="command-header">
+                <i data-lucide="command"></i>
+                <input type="text" id="commandInput" placeholder="Type a command or search..." autocomplete="off">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="command-results" id="commandResults">
+                <!-- Dynamic command results -->
+            </div>
+        </div>
+    </div>
+    <div id="qrOverlay" class="qr-overlay" style="display: none;" onclick="closeQR()">
+        <div class="qr-stage" onclick="event.stopPropagation()">
+            <div class="qr-header">
+                <i data-lucide="qr-code"></i>
+                <h3>Digital Contact Sync</h3>
+                <p>Scan this code to save to your phone</p>
+            </div>
+            <div id="qrcode"></div>
+            <div class="qr-footer">
+                <h4 id="qrContactName"></h4>
+                <p id="qrContactPhone"></p>
+                <button class="btn-primary" onclick="closeQR()">Close Stage</button>
+            </div>
+        </div>
+    </div>
+    <!-- Main Dashboard View -->
+    <div id="listView" class="container view">
+        <!-- Advanced Header -->
+        <header class="advanced-header">
+            <div class="header-left">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i data-lucide="contact"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>ContactPro X</h1>
+                        <span class="version">Enterprise Edition</span>
+                    </div>
+                </div>
+                
+                <!-- Global Search -->
+                <div class="global-search">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Search contacts, notes, or commands..." 
+                           oninput="handleGlobalSearch()" onkeydown="handleCommandKeydown(event)">
+                    <kbd class="command-hint">⌘K</kbd>
+                </div>
+            </div>
+
             <div class="header-actions">
-                <button class="btn-export" onclick="exportContacts()">📥 Export</button>
-                <button class="btn-primary" onclick="openModal()">➕ Add Contact</button>
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="importContacts()" title="Import Contacts">
+                        <i data-lucide="upload"></i>
+                        <span>Import</span>
+                    </button>
+                    <button class="action-btn" onclick="exportContacts()" title="Export Contacts">
+                        <i data-lucide="download"></i>
+                        <span>Export</span>
+                    </button>
+                    <button class="action-btn" onclick="openAnalytics()" title="Analytics Dashboard">
+                        <i data-lucide="bar-chart-3"></i>
+                        <span>Analytics</span>
+                    </button>
+                    <button class="action-btn" onclick="toggleSelectionMode()" title="Multi-Delete" id="multiDeleteBtn">
+                        <i data-lucide="trash-2"></i>
+                        <span>Multi-Select</span>
+                    </button>
+                </div>
+
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <button class="btn-primary" onclick="openForm()">
+                        <i data-lucide="plus"></i> Add Contact
+                    </button>
+                    <div class="user-avatar" onclick="toggleUserMenu()">
+                        <i data-lucide="user-circle"></i>
+                    </div>
+                    <div id="userDropdown" class="user-dropdown">
+                        <a href="/ultra-pro"><i data-lucide="zap"></i> Ultra Pro Interface</a>
+                        <a href="/ai-dashboard"><i data-lucide="brain"></i> AI Dashboard</a>
+                        <hr>
+                        <a href="#" onclick="openSettings()"><i data-lucide="settings"></i> Settings</a>
+                        <a href="#" onclick="openVault()"><i data-lucide="shield-lock"></i> Security Vault</a>
+                        <a href="#" onclick="toggleTheme()"><i data-lucide="moon"></i> Dark Mode</a>
+                        <hr>
+                        <a href="#" onclick="showAbout()"><i data-lucide="info"></i> About</a>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <div class="search-filter">
-            <input type="text" id="searchInput" placeholder="🔍 Search contacts..." oninput="filterContacts()">
-            <select id="categoryFilter" onchange="filterContacts()">
-                <option value="">All Categories</option>
-                <option value="Family">Family</option>
-                <option value="Friends">Friends</option>
-                <option value="Work">Work</option>
-                <option value="General">General</option>
-            </select>
-            <button class="btn-filter" onclick="toggleFavorites()">⭐ Favorites</button>
+        <!-- Advanced Stats Dashboard -->
+        <div class="advanced-stats">
+            <div class="stat-row">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalContacts" class="stat-number">0</h3>
+                        <p>Total Contacts</p>
+                        <span class="stat-change positive">
+                            <i data-lucide="trending-up"></i> +12% this month
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card secondary">
+                    <div class="stat-icon">
+                        <i data-lucide="star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="favoriteCount" class="stat-number">0</h3>
+                        <p>Starred Contacts</p>
+                        <span class="stat-change neutral">
+                            <i data-lucide="minus"></i> No change
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card tertiary">
+                    <div class="stat-icon">
+                        <i data-lucide="calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="upcomingEvents" class="stat-number">0</h3>
+                        <p>Upcoming Events</p>
+                        <span class="stat-change positive">
+                            <i data-lucide="clock"></i> Next: Today
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card analytics">
+                    <div class="stat-icon">
+                        <i data-lucide="activity"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="recentActivity" class="stat-number">0</h3>
+                        <p>Recent Activity</p>
+                        <span class="stat-change positive">
+                            <i data-lucide="zap"></i> High engagement
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Distribution Chart -->
+            <div class="chart-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i data-lucide="pie-chart"></i> Network Distribution</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" onclick="switchChart('pie')">Pie</button>
+                            <button class="chart-btn" onclick="switchChart('bar')">Bar</button>
+                            <button class="chart-btn" onclick="switchChart('doughnut')">Doughnut</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="networkChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="quick-actions-card">
+                    <h3><i data-lucide="zap"></i> Quick Actions</h3>
+                    <div class="quick-grid">
+                        <button class="quick-action" onclick="bulkFavorite()">
+                            <i data-lucide="star"></i> Bulk Favorite
+                        </button>
+                        <button class="quick-action" onclick="bulkCategory()">
+                            <i data-lucide="tag"></i> Bulk Category
+                        </button>
+                        <button class="quick-action" onclick="duplicateContacts()">
+                            <i data-lucide="copy"></i> Duplicate
+                        </button>
+                        <button class="quick-action" onclick="mergeContacts()">
+                            <i data-lucide="git-merge"></i> Merge
+                        </button>
+                        <button class="quick-action" onclick="backupData()">
+                            <i data-lucide="cloud-upload"></i> Backup
+                        </button>
+                        <button class="quick-action" onclick="syncContacts()">
+                            <i data-lucide="refresh-cw"></i> Sync
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <span class="stat-number" id="totalContacts">0</span>
-                <span class="stat-label">Total Contacts</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="favoriteCount">0</span>
-                <span class="stat-label">Favorites</span>
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-container">
+                <div class="search-enhanced">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="searchInput" placeholder="Search contacts by name, phone, email..." 
+                           oninput="filterContacts()">
+                    <div class="search-options">
+                        <button class="search-option" onclick="startVoiceSearch()" title="Voice Search">
+                            <i data-lucide="mic"></i>
+                        </button>
+                        <button class="search-option" onclick="clearSearch()" title="Clear Search">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="contactsGrid" class="contacts-grid"></div>
-    </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Add New Contact</h2>
-            <form id="contactForm" onsubmit="saveContact(event)">
-                <input type="hidden" id="contactId">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="name" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="tel" id="phone" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
+        <!-- Filter Controls Section -->
+        <div class="filter-section">
+            <div class="filter-controls">
+                <div class="filter-group">
                     <label>Category</label>
-                    <select id="category">
-                        <option value="General">General</option>
+                    <select id="categoryFilter" onchange="filterContacts()">
+                        <option value="">All Categories</option>
                         <option value="Family">Family</option>
                         <option value="Friends">Friends</option>
                         <option value="Work">Work</option>
+                        <option value="General">General</option>
                     </select>
                 </div>
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="favorite">
-                    <label for="favorite">⭐ Mark as Favorite</label>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortOrder" onchange="filterContacts()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="az">A - Z</option>
+                        <option value="za">Z - A</option>
+                        <option value="recently_updated">Recently Updated</option>
+                        <option value="most_contacted">Most Contacted</option>
+                    </select>
                 </div>
-                <button type="submit" class="btn-primary">Save Contact</button>
-            </form>
+
+                <div class="filter-group">
+                    <label>View</label>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setViewMode('grid')" title="Grid View">
+                            <i data-lucide="grid"></i>
+                        </button>
+                        <button class="view-btn" onclick="setViewMode('list')" title="List View">
+                            <i data-lucide="list"></i>
+                        </button>
+                        <button class="view-btn" onclick="setViewMode('cards')" title="Card View">
+                            <i data-lucide="layout-grid"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button id="favToggleBtn" class="filter-btn" onclick="toggleFavFilter()">
+                        <i data-lucide="star"></i> Favorites
+                    </button>
+                    <button class="filter-btn" onclick="toggleBulkMode()">
+                        <i data-lucide="check-square"></i> Bulk
+                    </button>
+                    <button class="filter-btn" onclick="toggleAdvancedSearch()">
+                        <i data-lucide="filter"></i> Advanced
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Search Panel (Hidden by default) -->
+        <div id="advancedSearchPanel" class="advanced-search-collapsible" style="display: none;">
+            <div class="advanced-search-header">
+                <h3><i data-lucide="filter"></i> Advanced Search</h3>
+                <button class="collapse-btn" onclick="toggleAdvancedSearch()">
+                    <i data-lucide="chevron-up"></i>
+                </button>
+            </div>
+            <div class="advanced-search-grid">
+                <div class="form-group">
+                    <label>Name contains</label>
+                    <input type="text" id="advName" oninput="applyAdvancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Phone contains</label>
+                    <input type="text" id="advPhone" oninput="applyAdvancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Email contains</label>
+                    <input type="text" id="advEmail" oninput="applyAdvancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="advCategory" onchange="applyAdvancedSearch()">
+                        <option value="">All Categories</option>
+                        <option value="Family">Family</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Work">Work</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Created Date</label>
+                    <input type="date" id="advDate" onchange="applyAdvancedSearch()">
+                </div>
+                <div class="form-group">
+                    <label>Has Follow-up</label>
+                    <select id="advFollowUp" onchange="applyAdvancedSearch()">
+                        <option value="">All</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Bar -->
+        <div id="bulkActionsBar" class="bulk-actions-bar" style="display: none;">
+            <div class="bulk-left">
+                <span id="selectedCount">0 selected</span>
+                <button class="bulk-clear" onclick="clearBulkSelection()">Clear Selection</button>
+            </div>
+            <div class="bulk-right">
+                <button class="bulk-action" onclick="bulkFavoriteSelected()">
+                    <i data-lucide="star"></i> Favorite
+                </button>
+                <button class="bulk-action" onclick="bulkCategorySelected()">
+                    <i data-lucide="tag"></i> Category
+                </button>
+                <button class="bulk-action" onclick="bulkExportSelected()">
+                    <i data-lucide="download"></i> Export
+                </button>
+                <button class="bulk-action danger" onclick="bulkDeleteSelected()">
+                    <i data-lucide="trash-2"></i> Delete
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-layout">
+            <div class="content-side">
+                <!-- Selection Toolbar -->
+                <div id="selectionToolbar" class="selection-toolbar" style="display: none;">
+                    <div class="toolbar-content">
+                        <span class="selection-mode-label"><strong id="selectedCount">0</strong> contact(s) selected</span>
+                        <div class="toolbar-actions">
+                            <button class="btn-secondary" onclick="selectAllContacts()">Select All</button>
+                            <button class="btn-danger" onclick="bulkDeleteContacts()">
+                                <i data-lucide="trash-2"></i> Delete Selected
+                            </button>
+                            <button class="btn-secondary" onclick="toggleSelectionMode()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="contactsGrid" class="contacts-grid">
+                    <!-- Contacts will be dynamically injected here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-content">
+                        <i data-lucide="users"></i>
+                        <h3>No Contacts Found</h3>
+                        <p>Start building your network by adding your first contact</p>
+                        <button class="btn-primary" onclick="openForm()">
+                            <i data-lucide="plus"></i> Add Your First Contact
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Sidebar -->
+            <aside class="advanced-sidebar">
+                <!-- Quick Sync Panel -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <i data-lucide="zap"></i>
+                        <h3>Quick Sync</h3>
+                    </div>
+                    <div id="sidebarFavs" class="quick-sync-list">
+                        <!-- Top favorites will be here -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <i data-lucide="calendar-clock"></i>
+                        <h3>Upcoming Events</h3>
+                    </div>
+                    <div id="sidebarReminders" class="events-list">
+                        <!-- Smart reminders will be here -->
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <i data-lucide="activity"></i>
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div id="recentActivityList" class="activity-list">
+                        <!-- Recent activities will be here -->
+                    </div>
+                </div>
+
+                <!-- Smart Suggestions -->
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <i data-lucide="lightbulb"></i>
+                        <h3>Smart Suggestions</h3>
+                    </div>
+                    <div id="smartSuggestions" class="suggestions-list">
+                        <!-- AI-powered suggestions -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Private Vault Security Stage -->
+    <div id="vaultStage" class="vault-stage" style="display: none;">
+        <div class="pin-container">
+            <div class="pin-header">
+                <i data-lucide="shield-check"></i>
+                <h3>Authorize Vault Access</h3>
+                <p>Enter your 4-digit security PIN</p>
+            </div>
+            <div class="pin-display">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <div class="pin-grid">
+                <button onclick="pressPin('1')">1</button><button onclick="pressPin('2')">2</button><button onclick="pressPin('3')">3</button>
+                <button onclick="pressPin('4')">4</button><button onclick="pressPin('5')">5</button><button onclick="pressPin('6')">6</button>
+                <button onclick="pressPin('7')">7</button><button onclick="pressPin('8')">8</button><button onclick="pressPin('9')">9</button>
+                <button class="btn-clear" onclick="clearPin()">C</button><button onclick="pressPin('0')">0</button><button class="btn-exit" onclick="closeVault()"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Form View -->
+    <div id="formView" class="form-page view" style="display: none;">
+        <div class="form-container">
+            <div class="form-header">
+                <button class="back-btn" onclick="closeForm()">
+                    <i data-lucide="arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 id="formTitle">Create New Contact</h2>
+                <div class="form-actions">
+                    <button class="btn-draft" onclick="saveAsDraft()" title="Save progress as draft">
+                        <i data-lucide="save"></i> Save Draft
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-card">
+                <form id="contactForm" onsubmit="saveContact(event)">
+                    <input type="hidden" id="contactId">
+                    
+                    <div class="form-progress">
+                        <div class="progress-step active" data-step="1">
+                            <span class="step-number">1</span>
+                            <span class="step-label">Basic Info</span>
+                        </div>
+                        <div class="progress-step" data-step="2">
+                            <span class="step-number">2</span>
+                            <span class="step-label">Contact Details</span>
+                        </div>
+                        <div class="progress-step" data-step="3">
+                            <span class="step-number">3</span>
+                            <span class="step-label">Preferences</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h3 class="section-title"><i data-lucide="user"></i> Personal Identity</h3>
+                            <div class="form-group">
+                                <input type="text" id="name" placeholder=" " required>
+                                <label><i data-lucide="user"></i> Full Name *</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="company" placeholder=" ">
+                                <label><i data-lucide="building"></i> Company</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="title" placeholder=" ">
+                                <label><i data-lucide="briefcase"></i> Job Title</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group full-width">
+                                <div id="categoryChips" class="category-chips">
+                                    <button type="button" class="chip active" onclick="selectChip(this, 'General')">General</button>
+                                    <button type="button" class="chip" onclick="selectChip(this, 'Family')">Family</button>
+                                    <button type="button" class="chip" onclick="selectChip(this, 'Friends')">Friends</button>
+                                    <button type="button" class="chip" onclick="selectChip(this, 'Work')">Work</button>
+                                </div>
+                                <input type="hidden" id="category" name="category" value="General">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title"><i data-lucide="phone"></i> Contact Information</h3>
+                            <div class="form-group">
+                                <input type="tel" id="phone" placeholder=" " required>
+                                <label><i data-lucide="phone"></i> Primary Phone *</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" id="phone2" placeholder=" ">
+                                <label><i data-lucide="phone"></i> Secondary Phone</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="email" placeholder=" ">
+                                <label><i data-lucide="mail"></i> Email</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="email2" placeholder=" ">
+                                <label><i data-lucide="mail"></i> Secondary Email</label>
+                                <div class="focus-border"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title"><i data-lucide="map-pin"></i> Location & Timing</h3>
+                            
+                            <!-- Map Selection -->
+                            <div class="form-group">
+                                <label><i data-lucide="map"></i> Select Location on Map</label>
+                                <div class="map-container">
+                                    <div id="locationMap" class="location-map"></div>
+                                    <div class="map-controls">
+                                        <input type="text" id="mapSearch" placeholder="Search for a location..." class="map-search">
+                                        <button type="button" onclick="searchLocation()" class="map-search-btn">
+                                            <i data-lucide="search"></i>
+                                        </button>
+                                        <button type="button" onclick="getCurrentLocation()" class="map-location-btn" title="Use current location">
+                                            <i data-lucide="navigation"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden fields to store location data -->
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                            <input type="hidden" id="address" name="address">
+                            <input type="hidden" id="city" name="city">
+                            <input type="hidden" id="country" name="country">
+                            
+                            <!-- Display selected location -->
+                            <div class="form-group">
+                                <label><i data-lucide="map-pin"></i> Selected Location</label>
+                                <div id="selectedLocation" class="selected-location">
+                                    <div id="locationText" style="width: 100%; display: flex; align-items: center; flex-wrap: wrap; word-break: break-word;">No location selected</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="date" id="followUpDate" placeholder=" ">
+                                <label style="top: -20px; font-size: 0.85em; color: var(--primary);">
+                                    <i data-lucide="calendar"></i> Follow-up Date
+                                </label>
+                                <div class="focus-border"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3 class="section-title"><i data-lucide="message-circle"></i> Social & Notes</h3>
+                            <div class="form-group">
+                                <input type="url" id="website" placeholder=" ">
+                                <label><i data-lucide="globe"></i> Website</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="linkedin" placeholder=" ">
+                                <label><i data-lucide="linkedin"></i> LinkedIn</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="twitter" placeholder=" ">
+                                <label><i data-lucide="twitter"></i> Twitter</label>
+                                <div class="focus-border"></div>
+                            </div>
+                            <div class="form-group full-width">
+                                <textarea id="notes" placeholder=" " rows="4" class="notes-textarea"></textarea>
+                                <label><i data-lucide="file-text"></i> Notes</label>
+                                <div class="focus-border"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <div class="form-options">
+                            <div class="form-group checkbox">
+                                <input type="checkbox" id="private">
+                                <label for="private"><i data-lucide="lock"></i> Mark as Private</label>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="closeForm()">Cancel</button>
+                            <button type="submit" class="btn-primary luxury-save">
+                                <i data-lucide="save"></i> Save Contact
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline CRM Drawer -->
+    <div id="timelineDrawer" class="timeline-drawer view-hidden">
+        <div class="timeline-overlay" onclick="closeTimeline()"></div>
+        <div class="timeline-content">
+            <div class="timeline-header">
+                <button class="back-btn" onclick="closeTimeline()">
+                    <i data-lucide="x"></i>
+                </button>
+                <div class="timeline-profile">
+                    <div id="timelineAvatar" class="contact-avatar"></div>
+                    <div>
+                        <h2 id="timelineName">Contact Name</h2>
+                        <span id="timelineCategory" class="category-tag">General</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-body">
+                <div class="timeline-add-note">
+                    <form id="noteForm" onsubmit="saveNote(event)">
+                        <input type="hidden" id="timelineContactId">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <textarea id="noteText" placeholder="Log a meeting note, detail or update..." required></textarea>
+                            <div class="focus-border"></div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="padding: 10px 20px; font-size: 14px;">
+                            <i data-lucide="plus"></i> Add Note
+                        </button>
+                    </form>
+                </div>
+
+                <div class="timeline-list-container">
+                    <h3><i data-lucide="history"></i> Interaction Timeline</h3>
+                    <div id="timelineList" class="timeline-list">
+                        <!-- Notes will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <div id="analyticsView" class="analytics-view view" style="display: none;">
+        <div class="analytics-container">
+            <div class="analytics-header">
+                <button class="back-btn" onclick="closeAnalytics()">
+                    <i data-lucide="arrow-left"></i> Back to Dashboard
+                </button>
+                <h2>Analytics Dashboard</h2>
+                <div class="analytics-controls">
+                    <select id="analyticsPeriod" onchange="updateAnalytics()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last Year</option>
+                    </select>
+                    <button class="btn-primary" onclick="exportAnalytics()">
+                        <i data-lucide="download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Contact Growth</h3>
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h3>Category Distribution</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h3>Activity Timeline</h3>
+                    <canvas id="activityChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h3>Top Engaged Contacts</h3>
+                    <div id="topContacts" class="top-contacts-list">
+                        <!-- Top contacts will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Import Contacts</h3>
+                <button class="modal-close" onclick="closeImportModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="import-options">
+                    <div class="import-option" onclick="importFromCSV()">
+                        <i data-lucide="file-text"></i>
+                        <h4>Import from CSV</h4>
+                        <p>Upload a CSV file with contact data</p>
+                    </div>
+                    <div class="import-option" onclick="importFromVCard()">
+                        <i data-lucide="contact"></i>
+                        <h4>Import from vCard</h4>
+                        <p>Import from vCard (.vcf) files</p>
+                    </div>
+                    <div class="import-option" onclick="importFromGoogle()">
+                        <i data-lucide="chrome"></i>
+                        <h4>Import from Google</h4>
+                        <p>Sync contacts from Google Contacts</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map-functionality.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/location-sharing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin-settings.js') }}"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Initialize loading screen
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
+

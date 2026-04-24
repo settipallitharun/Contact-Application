@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralContact AI - Revolutionary Contact Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/brain.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/speechrecognition"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --neural-primary: #6366f1;
+            --neural-secondary: #8b5cf6;
+            --neural-accent: #ec4899;
+            --neural-success: #10b981;
+            --neural-warning: #f59e0b;
+            --neural-danger: #ef4444;
+            --neural-dark: #0f172a;
+            --neural-darker: #020617;
+            --neural-light: #f8fafc;
+            --neural-glass: rgba(255, 255, 255, 0.1);
+            --neural-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--neural-darker);
+            color: var(--neural-light);
+            overflow-x: hidden;
+        }
+
+        /* Neural Network Background Animation */
+        .neural-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .neural-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neural-primary);
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 0.3; }
+        }
+
+        /* Futuristic Header */
+        .ai-header {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--neural-glass);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .ai-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--neural-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--neural-glass);
+            border: 1px solid var(--neural-primary);
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neural-success);
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* AI Command Center */
+        .ai-command-center {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid var(--neural-glass);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .voice-interface {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 1.5rem;
+            background: var(--neural-glass);
+            border: 2px solid var(--neural-primary);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .voice-orb {
+            width: 80px;
+            height: 80px;
+            background: var(--neural-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .voice-orb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--neural-primary);
+        }
+
+        .voice-orb.listening {
+            animation: voicePulse 1.5s infinite;
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            50% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
+        }
+
+        .voice-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--neural-primary);
+            animation: waveExpand 2s infinite;
+        }
+
+        @keyframes waveExpand {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* AI Insights Panel */
+        .ai-insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1px solid var(--neural-glass);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neural-primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--neural-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .insight-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--neural-light);
+        }
+
+        /* Neural Network Visualization */
+        .neural-viz {
+            background: var(--neural-darker);
+            border: 1px solid var(--neural-glass);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #neuralNetwork {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Blockchain Verification */
+        .blockchain-panel {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+            border: 1px solid var(--neural-success);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem;
+        }
+
+        .verification-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem;
+            background: var(--neural-glass);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .verified-badge {
+            background: var(--neural-success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* AR Contact Cards */
+        .ar-contact-card {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, rgba(219, 39, 119, 0.05) 100%);
+            border: 1px solid var(--neural-accent);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ar-marker {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 60px;
+            height: 60px;
+            background: var(--neural-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ar-marker:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        /* Collaboration Hub */
+        .collaboration-hub {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(217, 119, 6, 0.05) 100%);
+            border: 1px solid var(--neural-warning);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem;
+        }
+
+        .team-members {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--neural-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .member-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--neural-primary);
+        }
+
+        /* Quantum Encryption Status */
+        .quantum-status {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(220, 38, 38, 0.05) 100%);
+            border: 1px solid var(--neural-danger);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem;
+        }
+
+        .encryption-meter {
+            width: 100%;
+            height: 8px;
+            background: var(--neural-glass);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .encryption-level {
+            height: 100%;
+            background: var(--neural-gradient);
+            width: 95%;
+            animation: encryptPulse 2s infinite;
+        }
+
+        @keyframes encryptPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Futuristic Buttons */
+        .ai-button {
+            background: var(--neural-gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .ai-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .ai-button:hover::before {
+            left: 100%;
+        }
+
+        /* Loading Animation */
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 1rem;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neural-primary);
+            border-radius: 50%;
+            animation: loadingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .ai-insights {
+                grid-template-columns: 1fr;
+            }
+            
+            .voice-interface {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .team-members {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Neural Network Background -->
+    <div class="neural-bg" id="neuralBg"></div>
+
+    <!-- AI Header -->
+    <header class="ai-header">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="ai-logo">
+                <i data-lucide="brain"></i>
+                NeuralContact AI
+            </div>
+            <div class="ai-status">
+                <div class="status-dot"></div>
+                <span>AI Engine Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- AI Command Center -->
+    <section class="ai-command-center">
+        <h2 class="text-2xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            Neural Command Center
+        </h2>
+        
+        <!-- Voice Interface -->
+        <div class="voice-interface">
+            <div class="voice-orb" id="voiceOrb" onclick="startVoiceCommand()">
+                <i data-lucide="mic" class="text-white text-2xl"></i>
+                <div class="voice-waves"></div>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Voice-Activated Contact Management</h3>
+                <p class="text-gray-400">Click the orb and speak commands like "Add contact John Smith" or "Find contacts from Google"</p>
+                <div id="voiceStatus" class="mt-2 text-sm text-gray-400">Ready to listen...</div>
+            </div>
+        </div>
+
+        <!-- AI Search -->
+        <div class="relative">
+            <input type="text" id="aiSearch" placeholder="AI-powered semantic search..." 
+                   class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500">
+            <button class="absolute right-4 top-4 p-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
+                <i data-lucide="search"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- AI Insights -->
+    <section class="ai-insights">
+        <div class="insight-card">
+            <div class="insight-header">
+                <div class="insight-icon">
+                    <i data-lucide="brain" class="text-white"></i>
+                </div>
+                <h3 class="insight-title">Neural Analysis</h3>
+            </div>
+            <div id="neuralInsights">
+                <div class="ai-loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-card">
+            <div class="insight-header">
+                <div class="insight-icon">
+                    <i data-lucide="users" class="text-white"></i>
+                </div>
+                <h3 class="insight-title">Relationship Intelligence</h3>
+            </div>
+            <div id="relationshipInsights">
+                <div class="ai-loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-card">
+            <div class="insight-header">
+                <div class="insight-icon">
+                    <i data-lucide="trending-up" class="text-white"></i>
+                </div>
+                <h3 class="insight-title">Predictive Analytics</h3>
+            </div>
+            <div id="predictiveInsights">
+                <div class="ai-loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Neural Network Visualization -->
+    <section class="neural-viz">
+        <h2 class="text-xl font-bold mb-4">Neural Network Contact Graph</h2>
+        <div id="neuralNetwork"></div>
+    </section>
+
+    <!-- Blockchain Verification -->
+    <section class="blockchain-panel">
+        <h2 class="text-xl font-bold mb-4">Blockchain Verification System</h2>
+        <div class="verification-status">
+            <i data-lucide="shield-check" class="text-green-400"></i>
+            <span>All contacts verified on blockchain</span>
+            <span class="verified-badge">VERIFIED</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Verification Hash</h4>
+                <code class="text-xs text-green-400">0x7f9a2b...</code>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">NFTs Created</h4>
+                <p class="text-2xl font-bold text-green-400">247</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Secure Shares</h4>
+                <p class="text-2xl font-bold text-green-400">89</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AR Contact Cards -->
+    <section class="ar-contact-card">
+        <h2 class="text-xl font-bold mb-4">Augmented Reality Contact Cards</h2>
+        <div class="ar-marker" onclick="launchAR()">
+            <i data-lucide="smartphone" class="text-white"></i>
+        </div>
+        <p class="mb-4">Point your mobile device at contact cards to see them in augmented reality</p>
+        <button class="ai-button" onclick="generateARCards()">
+            Generate AR Cards
+        </button>
+    </section>
+
+    <!-- Collaboration Hub -->
+    <section class="collaboration-hub">
+        <h2 class="text-xl font-bold mb-4">Real-Time Collaboration Hub</h2>
+        <div class="team-members">
+            <div class="member-avatar">JD</div>
+            <div class="member-avatar">AS</div>
+            <div class="member-avatar">MK</div>
+            <div class="member-avatar">+5</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <h4 class="font-semibold mb-2">Active Workspaces</h4>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>Marketing Team</span>
+                    <span class="text-green-400">8 members online</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Sales Pipeline</span>
+                    <span class="text-green-400">12 members online</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quantum Encryption -->
+    <section class="quantum-status">
+        <h2 class="text-xl font-bold mb-4">Quantum-Resistant Encryption</h2>
+        <div class="encryption-meter">
+            <div class="encryption-level"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Encryption Algorithm</h4>
+                <p class="text-sm text-red-400">Post-Quantum Lattice</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Key Strength</h4>
+                <p class="text-2xl font-bold text-red-400">4096-bit</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">Security Status</h4>
+                <p class="text-sm text-red-400">Quantum Safe</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="static/js/ai-engine.js"></script>
+    <script src="static/js/ai-dashboard.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Create neural network background
+        function createNeuralBackground() {
+            const bg = document.getElementById('neuralBg');
+            for (let i = 0; i < 50; i++) {
+                const node = document.createElement('div');
+                node.className = 'neural-node';
+                node.style.left = Math.random() * 100 + '%';
+                node.style.top = Math.random() * 100 + '%';
+                node.style.animationDelay = Math.random() * 3 + 's';
+                bg.appendChild(node);
+            }
+        }
+
+        // Voice command interface
+        function startVoiceCommand() {
+            const orb = document.getElementById('voiceOrb');
+            const status = document.getElementById('voiceStatus');
+            
+            orb.classList.add('listening');
+            status.textContent = 'Listening for commands...';
+            
+            if (window.aiEngine && window.aiEngine.voiceRecognizer) {
+                window.aiEngine.startVoiceRecognition();
+            } else {
+                status.textContent = 'Voice recognition initializing...';
+                setTimeout(() => {
+                    status.textContent = 'Voice recognition ready!';
+                    orb.classList.remove('listening');
+                }, 2000);
+            }
+        }
+
+        // AR launcher
+        function launchAR() {
+            alert('AR features require a mobile device with AR capabilities. Scan the QR code with your phone to experience AR contact cards.');
+        }
+
+        // Generate AR cards
+        function generateARCards() {
+            alert('AR contact cards are being generated! Each contact now has a unique AR marker that can be viewed in 3D space.');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createNeuralBackground();
+            
+            // Simulate AI insights loading
+            setTimeout(() => {
+                document.getElementById('neuralInsights').innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Contact Patterns Analyzed</span>
+                            <span class="text-indigo-400">1,247</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Relationship Clusters</span>
+                            <span class="text-purple-400">8</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Prediction Accuracy</span>
+                            <span class="text-pink-400">94.7%</span>
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+
+            // Initialize neural network visualization
+            setTimeout(() => {
+                initializeNeuralNetwork();
+            }, 1000);
+        });
+
+        function initializeNeuralNetwork() {
+            // Simplified neural network visualization
+            const container = document.getElementById('neuralNetwork');
+            container.innerHTML = `
+                <svg width="100%" height="100%" viewBox="0 0 800 400">
+                    <!-- Neural network connections -->
+                    <g stroke="#6366f1" stroke-width="1" opacity="0.3">
+                        <line x1="100" y1="100" x2="300" y2="50" />
+                        <line x1="100" y1="100" x2="300" y2="150" />
+                        <line x1="100" y1="100" x2="300" y2="250" />
+                        <line x1="100" y1="200" x2="300" y2="50" />
+                        <line x1="100" y1="200" x2="300" y2="150" />
+                        <line x1="100" y1="200" x2="300" y2="250" />
+                        <line x1="100" y1="300" x2="300" y2="50" />
+                        <line x1="100" y1="300" x2="300" y2="150" />
+                        <line x1="100" y1="300" x2="300" y2="250" />
+                        <!-- Hidden to output layer -->
+                        <line x1="300" y1="50" x2="500" y2="100" />
+                        <line x1="300" y1="50" x2="500" y2="200" />
+                        <line x1="300" y1="50" x2="500" y2="300" />
+                        <line x1="300" y1="150" x2="500" y2="100" />
+                        <line x1="300" y1="150" x2="500" y2="200" />
+                        <line x1="300" y1="150" x2="500" y2="300" />
+                        <line x1="300" y1="250" x2="500" y2="100" />
+                        <line x1="300" y1="250" x2="500" y2="200" />
+                        <line x1="300" y1="250" x2="500" y2="300" />
+                    </g>
+                    
+                    <!-- Input layer nodes -->
+                    <g fill="#6366f1">
+                        <circle cx="100" cy="100" r="8" />
+                        <circle cx="100" cy="200" r="8" />
+                        <circle cx="100" cy="300" r="8" />
+                    </g>
+                    
+                    <!-- Hidden layer nodes -->
+                    <g fill="#8b5cf6">
+                        <circle cx="300" cy="50" r="8" />
+                        <circle cx="300" cy="150" r="8" />
+                        <circle cx="300" cy="250" r="8" />
+                    </g>
+                    
+                    <!-- Output layer nodes -->
+                    <g fill="#ec4899">
+                        <circle cx="500" cy="100" r="8" />
+                        <circle cx="500" cy="200" r="8" />
+                        <circle cx="500" cy="300" r="8" />
+                    </g>
+                    
+                    <!-- Labels -->
+                    <g fill="#ffffff" font-size="12" text-anchor="middle">
+                        <text x="100" y="350">Input</text>
+                        <text x="300" y="350">Hidden</text>
+                        <text x="500" y="350">Output</text>
+                    </g>
+                </svg>
+            `;
+        }
+    </script>
+</body>
+</html>

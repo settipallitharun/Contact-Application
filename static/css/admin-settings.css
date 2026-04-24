@@ -1,0 +1,280 @@
+/* Admin Settings Panel */
+.admin-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-settings-content {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-xl);
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.settings-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-close {
+    width: 32px;
+    height: 32px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+}
+
+.settings-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.settings-info {
+    flex: 1;
+}
+
+.settings-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.settings-info p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.settings-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: var(--glass-border);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-toggle-switch.active {
+    background: var(--primary);
+}
+
+.admin-toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.admin-toggle-switch.active::after {
+    transform: translateX(30px);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.status-indicator.active {
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.status-indicator.inactive {
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.privacy-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.privacy-warning h4 {
+    color: var(--danger);
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.privacy-warning p {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Floating Action Button */
+.fab-settings {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.fab-settings:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-xl);
+}
+
+.fab-settings i {
+    color: white;
+    font-size: 24px;
+}
+
+/* Admin Status Banner */
+.admin-status-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--gradient-primary);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 9999;
+    display: none;
+}
+
+.admin-status-banner.show {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-settings-content {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .settings-header h2 {
+        font-size: 20px;
+    }
+    
+    .fab-settings {
+        bottom: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+    }
+    
+    .fab-settings i {
+        font-size: 20px;
+    }
+}
